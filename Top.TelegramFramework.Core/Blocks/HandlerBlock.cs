@@ -4,12 +4,13 @@ using Telegram.Bot;
 
 namespace Top.TelegramFramework.Core.Blocks
 {
-    public abstract class CompositeBlock
+    public abstract class HandlerBlock
     {
         /// <summary>
         /// Идентификатор блока.
         /// </summary>
         public abstract string BlockId { get; }
+        public LogString? Logger {  get; set; }
 
         /// <summary>
         /// Внутреннее состояние блока.
@@ -37,8 +38,8 @@ namespace Top.TelegramFramework.Core.Blocks
         /// <summary>
         /// Обработка входящего сообщения в блоке.
         /// </summary>
-        public abstract Task<CompositeBlockResult> HandleAsync(Message message, BlockExecutionContext context, ITelegramBotClient bot, CancellationToken ct);
-        public abstract Task<CompositeBlockResult> HandleCallbackAsync(CallbackQuery callback, BlockExecutionContext context, ITelegramBotClient bot, CancellationToken ct);
+        public abstract Task<HandlerBlockResult> HandleAsync(Message message, BlockExecutionContext context, ITelegramBotClient bot, CancellationToken ct);
+        public abstract Task<HandlerBlockResult> HandleCallbackAsync(CallbackQuery callback, BlockExecutionContext context, ITelegramBotClient bot, CancellationToken ct);
         /// <summary>
         /// Метод, вызываемый при завершении работы блока.
         /// </summary>
@@ -47,6 +48,6 @@ namespace Top.TelegramFramework.Core.Blocks
         /// <summary>
         /// Метод для клонирования блока.
         /// </summary>
-        public abstract CompositeBlock Clone();
+        public abstract HandlerBlock Clone();
     }
 }

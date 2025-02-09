@@ -3,7 +3,7 @@ namespace Top.TelegramFramework.Core
 {
     public class ScenarioSelector
     {
-        private readonly List<(Scenario scenario, Func<long, bool> condition)> _rules = new List<(Scenario, Func<long, bool>)>();
+        private readonly List<(Scenario scenario, Func<long, bool> condition)> _rules = [];
         private Scenario _defaultScenario;
 
         public void Register(Scenario scenario, Func<long, bool> condition)

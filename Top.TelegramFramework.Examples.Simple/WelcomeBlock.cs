@@ -5,7 +5,7 @@ using Top.TelegramFramework.Core.Blocks;
 
 namespace Top.TelegramFramework.Examples.Simple
 {
-    public class WelcomeBlock : CompositeBlock
+    public class WelcomeBlock : HandlerBlock
     {
         public override string BlockId => "welcome";
 
@@ -15,17 +15,17 @@ namespace Top.TelegramFramework.Examples.Simple
             await bot.SendMessage(context.ChatId, "Добро пожаловать! Пожалуйста, введите своё имя:", cancellationToken: ct);
         }
 
-        public override async Task<CompositeBlockResult> HandleAsync(Message message, BlockExecutionContext context, ITelegramBotClient bot, CancellationToken ct)
+        public override async Task<HandlerBlockResult> HandleAsync(Message message, BlockExecutionContext context, ITelegramBotClient bot, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(message.Text))
             {
-                return CompositeBlockResult.Error("Имя не может быть пустым");
+                return HandlerBlockResult.Error("Имя не может быть пустым");
             }
             Int64 count = context.State.TryGetValue("Count", out object? obj) ? (Int64)obj : 1;
             await bot.SendMessage(context.ChatId, $"Твоё имя: {message.Text}.\nТы бежишь в этом колесе {count} круг!", cancellationToken: ct);
 
             // Передаём количество в контекст для следующего блока.
-            return CompositeBlockResult.End(
+            return HandlerBlockResult.End(
                 nextBlockId: BlockId,
                 data: new Dictionary<string, object>
                 {
@@ -34,12 +34,12 @@ namespace Top.TelegramFramework.Examples.Simple
             );
         }
 
-        public override CompositeBlock Clone()
+        public override WelcomeBlock Clone()
             => new WelcomeBlock();
 
         public override void OnEnd() { }
 
-        public override Task<CompositeBlockResult> HandleCallbackAsync(CallbackQuery callback, BlockExecutionContext context, ITelegramBotClient bot, CancellationToken ct)
+        public override Task<HandlerBlockResult> HandleCallbackAsync(CallbackQuery callback, BlockExecutionContext context, ITelegramBotClient bot, CancellationToken ct)
             => throw new NotImplementedException();
     }
 }

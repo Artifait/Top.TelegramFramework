@@ -5,9 +5,18 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Top.TelegramFramework.Core.Blocks;
 using Top.TelegramFramework.Core.Data;
+using Top.TelegramFramework.Core.Utilities;
 
 namespace Top.TelegramFramework.Core
 {
+    public enum LoggedMessageType
+    {
+        Information,
+        Errore,
+        Warning
+    }
+    public delegate Task LogString(string message, LoggedMessageType messageType = LoggedMessageType.Information);
+
     public class BotEngine
     {
         private ScenarioSelector _scenarioSelector;
@@ -15,6 +24,7 @@ namespace Top.TelegramFramework.Core
         private readonly UserStateContext _userStateContext;
         private ITelegramBotClient _bot;
         public ITelegramBotClient Bot => _bot; 
+        public LogString? Logger { get; set; } = ConsoleLogger.LogLine;
 
         public BotEngine(ScenarioSelector scenarioSelector)
         {
@@ -42,7 +52,7 @@ namespace Top.TelegramFramework.Core
                     async (bot, update, token) 
                         => await HandleUpdateAsync(update, token),
                     async (bot, exception, token) 
-                        => Console.WriteLine("Ошибка: " + exception.Message)
+                        => Logger?.Invoke("Ошибка: " + exception.Message, LoggedMessageType.Errore)
                 ),
                 cancellationToken: cts.Token);
 
@@ -58,6 +68,10 @@ namespace Top.TelegramFramework.Core
                 return;
 
             long chatId = update.Message != null ? update.Message.Chat.Id : update.CallbackQuery!.Message!.Chat.Id;
+            string username = update.Message != null ? update.Message!.From!.Username! : update.CallbackQuery!.Message!.From!.Username!;
+            string receivedText = update.Message != null ? update.Message!.Text! : $"callbackData: {update.CallbackQuery!.Data!}";
+            Logger?.Invoke($"[From: {username}, Received: {receivedText}]");
+
             // Выбор сценария для пользователя
             var scenario = _scenarioSelector.GetScenarioForUser(chatId);
             var scenarioId = scenario.ScenarioId;
@@ -65,12 +79,13 @@ namespace Top.TelegramFramework.Core
             // Получаем сохранённое состояние (если есть)
             var userState = await _stateRepository.GetUserStateAsync(chatId, scenarioId);
             BlockExecutionContext context = new BlockExecutionContext { ChatId = chatId };
-            CompositeBlock currentBlock;
+            HandlerBlock currentBlock;
 
             if (userState == null)
             {
                 // Если состояние отсутствует, выбираем стартовый блок
                 currentBlock = scenario.InitialBlock;
+                currentBlock.Logger = Logger;
                 await currentBlock.EnterAsync(context, _bot, ct);
                 await _stateRepository.SaveOrUpdateUserStateAsync(chatId, scenarioId, new UserState
                 {
@@ -84,11 +99,12 @@ namespace Top.TelegramFramework.Core
             {
                 // Восстанавливаем блок по его Id и применяем сохранённое внутреннее состояние
                 currentBlock = scenario.GetBlock(userState.CurrentCompositeBlockId);
+                currentBlock.Logger = Logger;
                 currentBlock.ApplyState(userState.CompositeBlockState);
                 context.State = userState.Context;
             }
 
-            CompositeBlockResult? result = null;
+            HandlerBlockResult? result = null;
 
             if (update.Message != null) {
                 result = await currentBlock.HandleAsync(update.Message, context, _bot, ct);
@@ -99,19 +115,19 @@ namespace Top.TelegramFramework.Core
 
             if(result == null)
             {
-                Console.WriteLine($"Нету результата от блока: {currentBlock.BlockId}");
+                Logger?.Invoke($"Нету результата от блока: {currentBlock.BlockId}", LoggedMessageType.Warning);
                 return;
             }
 
             UserState newState;
-            // Аналогичная логика обработки результата
             switch (result.resultState)
             {
-                case CompositeBlockResult.ResultState.IsError:
+                case HandlerBlockResult.ResultState.IsError:
+                    Logger?.Invoke($"[From: {username}, On Block: {currentBlock.BlockId}] -> {result.ErrorMessage}" , LoggedMessageType.Errore);
                     await _bot.SendMessage(chatId, $"Ошибка: {result.ErrorMessage}", cancellationToken: ct);
                     break;
 
-                case CompositeBlockResult.ResultState.IsContinue:
+                case HandlerBlockResult.ResultState.IsContinue:
                     newState = new UserState
                     {
                         CurrentCompositeBlockId = currentBlock.BlockId,
@@ -121,7 +137,7 @@ namespace Top.TelegramFramework.Core
                     await _stateRepository.SaveOrUpdateUserStateAsync(chatId, scenarioId, newState);
                     break;
 
-                case CompositeBlockResult.ResultState.IsEnd:
+                case HandlerBlockResult.ResultState.IsEnd:
                     currentBlock.OnEnd();
                     await _stateRepository.DeleteUserStateAsync(chatId, scenarioId);
                     if (result.NextBlockId != null)

@@ -11,8 +11,12 @@ namespace Top.TelegramFramework.BotDataEncryptor
             Console.Write("Введите главный пароль: ");
             var mainPassword = Console.ReadLine();
 
-            Console.WriteLine($"Зашифрованый токен: {AESCryptography.Encrypt(token!, mainPassword!)}");
-            Console.WriteLine($"Зашифрованый пароль: {PasswordManager.HashPassword(mainPassword!)}");
+            string tokenHash = AESCryptography.Encrypt(token!, mainPassword!);
+            string mainPasswordHash = PasswordManager.HashPassword(mainPassword!);
+
+            string resultClass = "    public static class AppData\r\n    {\r\n        public static string MainPasswordHash = \"" + mainPasswordHash + "\";\r\n        public static string TokenHash = \"" + tokenHash + "\";\r\n    }";
+
+            Console.WriteLine(resultClass);
         }
     }
 }

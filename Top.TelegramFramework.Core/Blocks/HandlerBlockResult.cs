@@ -1,7 +1,7 @@
 ﻿
 namespace Top.TelegramFramework.Core.Blocks
 {
-    public class CompositeBlockResult
+    public class HandlerBlockResult
     {
         public enum ResultState
         {
@@ -17,18 +17,18 @@ namespace Top.TelegramFramework.Core.Blocks
         public Dictionary<string, object> Data { get; set; } = [];
         public string? NextBlockId { get; set; }
 
-        public static CompositeBlockResult Error(string message, Dictionary<string, object> data = null)
+        public static HandlerBlockResult Error(string message, Dictionary<string, object> data = null)
         {
-            return new CompositeBlockResult 
+            return new HandlerBlockResult 
             { 
                 resultState = ResultState.IsError,
                 ErrorMessage = message, Data = data ?? []
             };
         }
 
-        public static CompositeBlockResult End(string? nextBlockId = null, Dictionary<string, object>? data = null)
+        public static HandlerBlockResult End(string? nextBlockId = null, Dictionary<string, object>? data = null)
         {
-            return new CompositeBlockResult 
+            return new HandlerBlockResult 
             { 
                 NextBlockId = nextBlockId,
                 resultState = ResultState.IsEnd,
@@ -36,9 +36,9 @@ namespace Top.TelegramFramework.Core.Blocks
             };
         }
 
-        public static CompositeBlockResult Continue(Dictionary<string, object>? data = null)
+        public static HandlerBlockResult Continue(Dictionary<string, object>? data = null)
         {
-            return new CompositeBlockResult 
+            return new HandlerBlockResult 
             { 
                 resultState = ResultState.IsContinue, 
                 Data = data ?? []

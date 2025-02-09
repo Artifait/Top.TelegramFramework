@@ -21,7 +21,7 @@ namespace Top.TelegramFramework.Examples.Simple
             var defaultScenario = new Scenario("default");
 
             // Регистрируем составной блок ClickerBlock в сценарии
-            defaultScenario.RegisterBlock(new WelcomeBlock());
+            defaultScenario.RegisterInitialBlock(new WelcomeBlock());
 
             // Регистрируем сценарий в селекторе сценариев. Здесь можно задать условие, при котором выбирается данный сценарий.
             // Для простоты можно сделать его сценарий по умолчанию.
