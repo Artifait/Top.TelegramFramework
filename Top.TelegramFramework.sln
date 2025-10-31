@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Top.TelegramFramework.Core", "Top.TelegramFramework.Core\Top.TelegramFramework.Core.csproj", "{2340B615-984D-44C9-8899-EAEFC2990191}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Top.TelegramFramework.Examples.Simple", "Top.TelegramFramework.Examples.Simple\Top.TelegramFramework.Examples.Simple.csproj", "{E04C3F11-C501-4A1B-99FB-67226FEB307B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{71DBF7B7-C397-466C-AB8C-6723C756DFAA}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2340B615-984D-44C9-8899-EAEFC2990191}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2340B615-984D-44C9-8899-EAEFC2990191}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2340B615-984D-44C9-8899-EAEFC2990191}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2340B615-984D-44C9-8899-EAEFC2990191}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E04C3F11-C501-4A1B-99FB-67226FEB307B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E04C3F11-C501-4A1B-99FB-67226FEB307B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E04C3F11-C501-4A1B-99FB-67226FEB307B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E04C3F11-C501-4A1B-99FB-67226FEB307B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
